@@ -11,28 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.9'
-      
-      - name: Install Heroku CLI
-        run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
-      
-      - name: Login to Heroku
+      - name: Heroku Authentication
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          echo "Machine Login"
-          heroku login
-          heroku container:login
-      
-      - name: Deploy to Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-        run: |
-          echo "Deploying to Heroku: $HEROKU_APP_NAME"
-          heroku container:push worker -a $HEROKU_APP_NAME
-          heroku container:release worker -a $HEROKU_APP_NAME
+          # Direct API Key Authentication
+          echo "machine git.heroku.com login x-api-key password $HEROKU_API_KEY" > ~/.netrc
+          chmod 600 ~/.netrc
+          
+          # Login Verification
+          heroku auth:whoami || true
