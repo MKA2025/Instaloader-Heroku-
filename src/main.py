@@ -200,7 +200,7 @@ class InstagramDownloader:
 # Main Execution
 def main():
     # Replace with your Telegram Bot Token
-    BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+    BOT_TOKEN = '7227851692:AAEgYq6VzKGQuKb4t-GSguepjMizR96Rlys'
     
     # Initialize and start the bot
     instagram_bot = InstagramDownloader(BOT_TOKEN)
