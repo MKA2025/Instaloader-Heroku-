@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Important for git history
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -22,9 +24,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Login to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:login
+
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: "your-heroku-app-name"
         run: |
-          git remote add heroku https://git.heroku.com/YOUR_HEROKU_APP_NAME.git
-          git push heroku main
+          heroku container:push worker -a $HEROKU_APP_NAME
+          heroku container:release worker -a $HEROKU_APP_NAME
