@@ -11,13 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Heroku Authentication
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          # Direct API Key Authentication
-          echo "machine git.heroku.com login x-api-key password $HEROKU_API_KEY" > ~/.netrc
-          chmod 600 ~/.netrc
-          
-          # Login Verification
-          heroku auth:whoami || true
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          usedocker: true
+          dockerfilePath: ./Dockerfile
