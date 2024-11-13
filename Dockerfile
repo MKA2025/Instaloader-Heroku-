@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy entire project
 COPY . .
 
-# Expose port (optional but recommended)
+# Expose port
 EXPOSE 5000
 
 # Use gunicorn for production
