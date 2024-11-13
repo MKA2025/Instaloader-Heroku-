@@ -2,6 +2,7 @@ import os
 import zipfile
 import instaloader
 import telegram
+from flask import Flask, jsonify, request
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 class InstagramDownloader:
@@ -197,14 +198,42 @@ class InstagramDownloader:
         self.updater.start_polling()
         self.updater.idle()
 
-# Main Execution
-def main():
-    # Replace with your Telegram Bot Token
-    BOT_TOKEN = '7227851692:AAEgYq6VzKGQuKb4t-GSguepjMizR96Rlys'
+# Flask Web Application
+app = Flask(__name__)
+
+# Global Bot Instance
+global_bot = None
+
+@app.route('/')
+def home():
+    return jsonify({
+        "status": "Running",
+        "bot": "Instagram Downloader Telegram Bot"
+    })
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    if request.method == 'POST':
+        # Process incoming Telegram update
+        update = telegram.Update.de_json(request.get_json(force=True), global_bot.bot)
+        global_bot.dispatcher.process_update(update)
+        return 'ok', 200
+
+def create_app():
+    global global_bot
+    BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+    if BOT_TOKEN:
+        global_bot = InstagramDownloader(BOT_TOKEN)
+        # Start the bot in a separate thread if needed
+        # from threading import Thread
+        # bot_thread = Thread(target=global_bot.start_bot)
+        # bot_thread.start()
     
-    # Initialize and start the bot
-    instagram_bot = InstagramDownloader(BOT_TOKEN)
-    instagram_bot.start_bot()
+    return app
+
+# For Gunicorn
+app = create_app()
 
 if __name__ == '__main__':
-    main()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
